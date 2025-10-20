@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,6 +12,8 @@ interface ResumeData {
   email: string
   phone: string
   location: string
+  photo: string
+  portfolioLink: string
   summary: string
   experience: Array<{
     id: string
@@ -36,10 +40,31 @@ interface ResumeFormProps {
 }
 
 export function ResumeForm({ data, onChange }: ResumeFormProps) {
-  const [expandedSection, setExpandedSection] = useState<string>("personal")
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["personal"]))
+
+  const toggleSection = (section: string) => {
+    const newExpanded = new Set(expandedSections)
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section)
+    } else {
+      newExpanded.add(section)
+    }
+    setExpandedSections(newExpanded)
+  }
 
   const updateField = (field: keyof ResumeData, value: any) => {
     onChange({ ...data, [field]: value })
+  }
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        updateField("photo", reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const addExperience = () => {
@@ -127,15 +152,34 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
   return (
     <div className="space-y-4">
       {/* Personal Information */}
-      <Card className="p-6">
+      <Card className="p-0">
         <button
-          onClick={() => setExpandedSection(expandedSection === "personal" ? "" : "personal")}
-          className="w-full text-left font-semibold text-slate-900 hover:text-blue-600 transition-colors"
+          onClick={() => toggleSection("personal")}
+          className="w-full text-left font-semibold text-slate-900 hover:bg-slate-50 transition-colors p-6 flex items-center justify-between"
         >
-          Personal Information
+          <span>👤 Personal Information</span>
+          <span className="text-slate-400">{expandedSections.has("personal") ? "−" : "+"}</span>
         </button>
-        {expandedSection === "personal" && (
-          <div className="mt-4 space-y-4">
+        {expandedSections.has("personal") && (
+          <div className="px-6 pb-6 space-y-4 border-t border-slate-200">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700">Profile Photo</label>
+              <div className="flex items-center gap-4">
+                {data.photo && (
+                  <img
+                    src={data.photo || "/placeholder.svg"}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-lg object-cover border border-slate-300"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
             <Input
               placeholder="Full Name"
               value={data.fullName}
@@ -153,6 +197,12 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
               value={data.location}
               onChange={(e) => updateField("location", e.target.value)}
             />
+            <Input
+              placeholder="Portfolio Link (e.g., https://yourportfolio.com)"
+              type="url"
+              value={data.portfolioLink}
+              onChange={(e) => updateField("portfolioLink", e.target.value)}
+            />
             <textarea
               placeholder="Professional Summary"
               value={data.summary}
@@ -165,22 +215,16 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
       </Card>
 
       {/* Experience */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setExpandedSection(expandedSection === "experience" ? "" : "experience")}
-            className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
-          >
-            Experience
-          </button>
-          {expandedSection === "experience" && (
-            <Button onClick={addExperience} size="sm" variant="outline" className="gap-2 bg-transparent">
-              + Add
-            </Button>
-          )}
-        </div>
-        {expandedSection === "experience" && (
-          <div className="mt-4 space-y-6">
+      <Card className="p-0">
+        <button
+          onClick={() => toggleSection("experience")}
+          className="w-full text-left font-semibold text-slate-900 hover:bg-slate-50 transition-colors p-6 flex items-center justify-between"
+        >
+          <span>💼 Experience</span>
+          <span className="text-slate-400">{expandedSections.has("experience") ? "−" : "+"}</span>
+        </button>
+        {expandedSections.has("experience") && (
+          <div className="px-6 pb-6 space-y-6 border-t border-slate-200">
             {data.experience.map((exp) => (
               <div key={exp.id} className="space-y-3 pb-4 border-b border-slate-200">
                 <div className="flex justify-between items-start">
@@ -226,27 +270,24 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
                 </div>
               </div>
             ))}
+            <Button onClick={addExperience} size="sm" variant="outline" className="gap-2 bg-transparent w-full">
+              + Add Experience
+            </Button>
           </div>
         )}
       </Card>
 
       {/* Education */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setExpandedSection(expandedSection === "education" ? "" : "education")}
-            className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
-          >
-            Education
-          </button>
-          {expandedSection === "education" && (
-            <Button onClick={addEducation} size="sm" variant="outline" className="gap-2 bg-transparent">
-              + Add
-            </Button>
-          )}
-        </div>
-        {expandedSection === "education" && (
-          <div className="mt-4 space-y-6">
+      <Card className="p-0">
+        <button
+          onClick={() => toggleSection("education")}
+          className="w-full text-left font-semibold text-slate-900 hover:bg-slate-50 transition-colors p-6 flex items-center justify-between"
+        >
+          <span>🎓 Education</span>
+          <span className="text-slate-400">{expandedSections.has("education") ? "−" : "+"}</span>
+        </button>
+        {expandedSections.has("education") && (
+          <div className="px-6 pb-6 space-y-6 border-t border-slate-200">
             {data.education.map((edu) => (
               <div key={edu.id} className="space-y-3 pb-4 border-b border-slate-200">
                 <div className="flex justify-between items-start">
@@ -283,27 +324,24 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
                 </div>
               </div>
             ))}
+            <Button onClick={addEducation} size="sm" variant="outline" className="gap-2 bg-transparent w-full">
+              + Add Education
+            </Button>
           </div>
         )}
       </Card>
 
       {/* Skills */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setExpandedSection(expandedSection === "skills" ? "" : "skills")}
-            className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
-          >
-            Skills
-          </button>
-          {expandedSection === "skills" && (
-            <Button onClick={addSkill} size="sm" variant="outline" className="gap-2 bg-transparent">
-              + Add
-            </Button>
-          )}
-        </div>
-        {expandedSection === "skills" && (
-          <div className="mt-4 space-y-3">
+      <Card className="p-0">
+        <button
+          onClick={() => toggleSection("skills")}
+          className="w-full text-left font-semibold text-slate-900 hover:bg-slate-50 transition-colors p-6 flex items-center justify-between"
+        >
+          <span>⭐ Skills</span>
+          <span className="text-slate-400">{expandedSections.has("skills") ? "−" : "+"}</span>
+        </button>
+        {expandedSections.has("skills") && (
+          <div className="px-6 pb-6 space-y-3 border-t border-slate-200">
             {data.skills.map((skill, index) => (
               <div key={index} className="flex gap-2">
                 <Input placeholder="Skill" value={skill} onChange={(e) => updateSkill(index, e.target.value)} />
@@ -317,6 +355,9 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
                 </Button>
               </div>
             ))}
+            <Button onClick={addSkill} size="sm" variant="outline" className="gap-2 bg-transparent w-full">
+              + Add Skill
+            </Button>
           </div>
         )}
       </Card>

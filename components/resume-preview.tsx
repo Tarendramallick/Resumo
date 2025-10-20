@@ -8,6 +8,8 @@ interface ResumeData {
   email: string
   phone: string
   location: string
+  photo: string
+  portfolioLink: string
   summary: string
   experience: Array<{
     id: string
@@ -76,17 +78,38 @@ export function ResumePreview({ data, template }: ResumePreviewProps) {
 function ModernTemplate({ data }: { data: ResumeData }) {
   return (
     <div className="space-y-6 text-sm">
-      {/* Header */}
       <div className="border-b-2 border-blue-600 pb-4">
-        <h1 className="text-3xl font-bold text-slate-900">{data.fullName}</h1>
-        <div className="flex gap-4 text-slate-600 mt-2">
-          {data.email && <span>{data.email}</span>}
-          {data.phone && <span>{data.phone}</span>}
-          {data.location && <span>{data.location}</span>}
+        <div className="flex gap-4 items-start">
+          {data.photo && (
+            <img
+              src={data.photo || "/placeholder.svg"}
+              alt="Profile"
+              className="w-24 h-24 rounded-lg object-cover border border-slate-300"
+            />
+          )}
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-slate-900">{data.fullName}</h1>
+            <div className="flex gap-4 text-slate-600 mt-2 flex-wrap">
+              {data.email && <span>{data.email}</span>}
+              {data.phone && <span>{data.phone}</span>}
+              {data.location && <span>{data.location}</span>}
+            </div>
+            {data.portfolioLink && (
+              <div className="mt-2">
+                <a
+                  href={data.portfolioLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  Portfolio: {data.portfolioLink}
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Summary */}
       {data.summary && (
         <div>
           <h2 className="text-lg font-bold text-slate-900 mb-2">Professional Summary</h2>
@@ -94,7 +117,6 @@ function ModernTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Experience */}
       {data.experience.length > 0 && (
         <div>
           <h2 className="text-lg font-bold text-slate-900 mb-3">Experience</h2>
@@ -117,7 +139,6 @@ function ModernTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Education */}
       {data.education.length > 0 && (
         <div>
           <h2 className="text-lg font-bold text-slate-900 mb-3">Education</h2>
@@ -138,7 +159,6 @@ function ModernTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Skills */}
       {data.skills.length > 0 && (
         <div>
           <h2 className="text-lg font-bold text-slate-900 mb-2">Skills</h2>
@@ -161,19 +181,38 @@ function ModernTemplate({ data }: { data: ResumeData }) {
 function ClassicTemplate({ data }: { data: ResumeData }) {
   return (
     <div className="space-y-4 text-sm font-serif">
-      {/* Header */}
       <div className="text-center border-b border-slate-400 pb-3">
+        {data.photo && (
+          <div className="flex justify-center mb-3">
+            <img
+              src={data.photo || "/placeholder.svg"}
+              alt="Profile"
+              className="w-20 h-20 rounded-full object-cover border border-slate-300"
+            />
+          </div>
+        )}
         <h1 className="text-2xl font-bold text-slate-900">{data.fullName}</h1>
-        <div className="flex justify-center gap-4 text-slate-700 text-xs mt-1">
+        <div className="flex justify-center gap-4 text-slate-700 text-xs mt-1 flex-wrap">
           {data.email && <span>{data.email}</span>}
           {data.phone && <span>|</span>}
           {data.phone && <span>{data.phone}</span>}
           {data.location && <span>|</span>}
           {data.location && <span>{data.location}</span>}
         </div>
+        {data.portfolioLink && (
+          <div className="mt-2 text-xs">
+            <a
+              href={data.portfolioLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              {data.portfolioLink}
+            </a>
+          </div>
+        )}
       </div>
 
-      {/* Summary */}
       {data.summary && (
         <div>
           <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Professional Summary</h2>
@@ -181,7 +220,6 @@ function ClassicTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Experience */}
       {data.experience.length > 0 && (
         <div>
           <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Experience</h2>
@@ -202,7 +240,6 @@ function ClassicTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Education */}
       {data.education.length > 0 && (
         <div>
           <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Education</h2>
@@ -221,7 +258,6 @@ function ClassicTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Skills */}
       {data.skills.length > 0 && (
         <div>
           <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Skills</h2>
@@ -235,17 +271,36 @@ function ClassicTemplate({ data }: { data: ResumeData }) {
 function MinimalTemplate({ data }: { data: ResumeData }) {
   return (
     <div className="space-y-3 text-xs">
-      {/* Header */}
       <div>
+        {data.photo && (
+          <div className="mb-3">
+            <img
+              src={data.photo || "/placeholder.svg"}
+              alt="Profile"
+              className="w-16 h-16 rounded object-cover border border-slate-300"
+            />
+          </div>
+        )}
         <h1 className="text-xl font-bold text-slate-900">{data.fullName}</h1>
         <div className="text-slate-600 space-y-0.5">
           {data.email && <div>{data.email}</div>}
           {data.phone && <div>{data.phone}</div>}
           {data.location && <div>{data.location}</div>}
+          {data.portfolioLink && (
+            <div>
+              <a
+                href={data.portfolioLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                {data.portfolioLink}
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Summary */}
       {data.summary && (
         <div>
           <h2 className="font-bold text-slate-900">SUMMARY</h2>
@@ -253,7 +308,6 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Experience */}
       {data.experience.length > 0 && (
         <div>
           <h2 className="font-bold text-slate-900">EXPERIENCE</h2>
@@ -272,7 +326,6 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Education */}
       {data.education.length > 0 && (
         <div>
           <h2 className="font-bold text-slate-900">EDUCATION</h2>
@@ -288,7 +341,6 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
         </div>
       )}
 
-      {/* Skills */}
       {data.skills.length > 0 && (
         <div>
           <h2 className="font-bold text-slate-900">SKILLS</h2>

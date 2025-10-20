@@ -12,6 +12,8 @@ export default function BuilderPage() {
     email: "",
     phone: "",
     location: "",
+    photo: "",
+    portfolioLink: "",
     summary: "",
     experience: [],
     education: [],
