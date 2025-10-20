@@ -19,9 +19,11 @@ export default function BuilderPage() {
     certifications: [],
   })
   const [isFormatting, setIsFormatting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleFormatWithAI = async () => {
     setIsFormatting(true)
+    setError(null)
     try {
       const response = await fetch("/api/format-resume", {
         method: "POST",
@@ -29,9 +31,16 @@ export default function BuilderPage() {
         body: JSON.stringify(resumeData),
       })
       const formatted = await response.json()
+
+      if (!response.ok) {
+        setError(formatted.error || "Failed to format resume")
+        return
+      }
+
       setResumeData(formatted)
     } catch (error) {
       console.error("Error formatting resume:", error)
+      setError("Failed to format resume. Please try again.")
     } finally {
       setIsFormatting(false)
     }
@@ -51,6 +60,18 @@ export default function BuilderPage() {
             {isFormatting ? "Formatting..." : "Format with AI"}
           </button>
         </div>
+        {error && (
+          <div className="bg-red-50 border-t border-red-200 px-4 sm:px-6 lg:px-8 py-3">
+            <p className="text-sm text-red-700">
+              {error}
+              {error.includes("API key") && (
+                <span className="block mt-1">
+                  Please add your OpenAI API key to the environment variables (Vars section in the sidebar).
+                </span>
+              )}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
